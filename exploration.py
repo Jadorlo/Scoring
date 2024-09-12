@@ -32,7 +32,7 @@ def test():
     pass
 
 def main():
-    df = pd.read_csv('/Users/alexanderlunel/Documents/LILLE/Master/MasterSIAD/M2/Scoring/Etude de cas/revenus.csv')
+    df = pd.read_csv('revenus.csv')
     df = drop_columns(df)
     df = delete_na(df)
     #boxplot(df)
