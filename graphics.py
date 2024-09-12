@@ -28,7 +28,7 @@ def pieplot(df):
     plt.savefig('images/piecharts.png')    
 
 def main():
-    df = pd.read_csv('clean.csv')
+    df = pd.read_csv('files/clean.csv')
     boxplot(df)
     pieplot(df)
 

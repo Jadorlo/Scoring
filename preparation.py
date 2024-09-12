@@ -22,10 +22,10 @@ def drop_columns(df):
     return df
 
 def main():
-    df = pd.read_csv('revenus.csv')
+    df = pd.read_csv('files/revenus.csv')
     df = drop_columns(df)
     df = delete_na(df)
     df.index.name = 'index'
-    df.to_csv('clean.csv')
+    df.to_csv('files/clean.csv')
 
 main()
