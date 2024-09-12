@@ -1,7 +1,4 @@
 import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
-import numpy as np
 
 def delete_na(df):
     """
@@ -17,11 +14,14 @@ def drop_columns(df):
     """
     Drop la colonne fnlwgt car inutile
     """
-    df.drop("fnlwgt", inplace=True, axis=1)
+    df.drop(["fnlwgt", "educational-num"], inplace=True, axis=1)
 
     return df
 
 def main():
+    """
+    
+    """
     df = pd.read_csv('files/revenus.csv')
     df = drop_columns(df)
     df = delete_na(df)
