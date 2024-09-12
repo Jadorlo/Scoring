@@ -25,7 +25,7 @@ def main():
     df = pd.read_csv('files/revenus.csv')
     df = drop_columns(df)
     df = delete_na(df)
-    df.index.name = 'index'
-    df.to_csv('files/clean.csv')
+    df.reset_index(inplace=True, drop=True)
+    df.to_csv('files/clean.csv', index=False)
 
 main()
