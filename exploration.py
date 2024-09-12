@@ -28,6 +28,9 @@ def pieplot(df):
     df.select_dtypes(include='object').plot(kind='pie',subplots=True, figsize=(22,6))
     plt.show()
 
+def test():
+    pass
+
 def main():
     df = pd.read_csv('/Users/alexanderlunel/Documents/LILLE/Master/MasterSIAD/M2/Scoring/Etude de cas/revenus.csv')
     df = drop_columns(df)
