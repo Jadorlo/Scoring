@@ -22,8 +22,6 @@ def main():
     df = pd.read_csv('revenus.csv')
     df = drop_columns(df)
     df = delete_na(df)
-    #boxplot(df)
-    pieplot(df)
 
 main()
 
