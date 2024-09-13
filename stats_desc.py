@@ -10,9 +10,8 @@ def boxplot(df):
     """
     
     """
-    df_box = df.drop('index', axis=1)
     plt.figure()
-    df_box.plot(kind='box', subplots=True, figsize=(22,6))
+    df.plot(kind='box', subplots=True, figsize=(22,6))
     file = args.filename.split('.')[0].split('/')[-1]
     plt.savefig(f'images/boxplot_{file}.png')
 
@@ -30,12 +29,16 @@ def pieplot(df):
     plt.tight_layout()
     fig.suptitle('Proportion des variables qualitatives')
     file = args.filename.split('.')[0].split('/')[-1]
-    plt.savefig(f'images/piecharts_{file}.png')    
+    plt.savefig(f'images/piecharts_{file}.png')
+
+    
+
+
 
 def main():
     df = pd.read_csv(args.filename)
-    boxplot(df)
-    pieplot(df)
+    # boxplot(df)
+    # pieplot(df)
 
 if __name__ == "__main__":
     main()
