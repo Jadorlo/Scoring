@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 from scipy.stats import chi2_contingency
+import time
 
 def generate_classes(serie):
     """
@@ -21,6 +22,7 @@ def generate_classes(serie):
         """
         df_classes = pd.cut(serie, random_cuts(serie, 5), right=True, include_lowest=True)
         while any(df_classes.value_counts()<(0.1*len(df_classes))):
+
             df_classes = pd.cut(serie, random_cuts(serie, 5), right=True, include_lowest=True)
 
         return df_classes
@@ -40,9 +42,15 @@ def optimize_classes(serie, df_income):
     
     df_classes_min = generate_classes(serie)
     khisq_min, pval_min, ddl_min = khi2(df_classes_min, df_income)
+    n=100
+    deltas=[]
 
-    for i in range(100):
+    for i in range(n):
+        time1 = time.time()*1000
         df_classes = generate_classes(serie)
+        time2 = time.time()*1000
+        deltas.append((time2-time1)/1000)
+        print(i,'  Temps:', (deltas[-1]))
         khisq, pval, ddl = khi2(df_classes, df_income)
         if (khisq > khisq_min) and (pval<=pval_min):
             conv = i
@@ -50,13 +58,16 @@ def optimize_classes(serie, df_income):
             khisq_min = khisq
             pval_min = pval
             ddl_min = ddl
+    sum_delta = sum(deltas)
+    print('Temps total:', sum_delta, sum_delta/60)
+    print('Temps moyen pour une génération de table:', sum_delta/n)
         
     return df_classes_min, khisq_min, pval_min, ddl_min, conv
         
 def main():
     df = pd.read_csv('files/clean.csv')
     df_income = df['income']
-    df_classes, khisq, pval, ddl, conv = optimize_classes(df['hours-per-week'], df_income)
+    df_classes, khisq, pval, ddl, conv = optimize_classes(df['age'], df_income)
     print(df_classes, khisq, pval, ddl, conv)
     df_classes.to_csv(f'files/classes_opti_{df_classes.name}.csv', index=False)
 
