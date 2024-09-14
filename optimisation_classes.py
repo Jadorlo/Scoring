@@ -20,10 +20,10 @@ def generate_classes(serie):
     def create_test_classes(serie):
         """
         """
-        df_classes = pd.cut(serie, random_cuts(serie, 5), right=True, include_lowest=True)
+        df_classes = pd.cut(serie, random_cuts(serie, 4), right=True, include_lowest=True)
         while any(df_classes.value_counts()<(0.1*len(df_classes))):
 
-            df_classes = pd.cut(serie, random_cuts(serie, 5), right=True, include_lowest=True)
+            df_classes = pd.cut(serie, random_cuts(serie, 4), right=True, include_lowest=True)
 
         return df_classes
         
@@ -67,7 +67,7 @@ def optimize_classes(serie, df_income):
 def main():
     df = pd.read_csv('files/clean.csv')
     df_income = df['income']
-    df_classes, khisq, pval, ddl, conv = optimize_classes(df['age'], df_income)
+    df_classes, khisq, pval, ddl, conv = optimize_classes(df['hours-per-week'], df_income)
     print(df_classes, khisq, pval, ddl, conv)
     df_classes.to_csv(f'files/classes_opti_{df_classes.name}.csv', index=False)
 
