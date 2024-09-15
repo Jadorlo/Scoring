@@ -30,6 +30,8 @@ def generate_classes(serie):
     df_classes = create_test_classes(serie)
     return df_classes
 
+
+
 def optimize_classes(serie, df_income):
     """
     """
@@ -66,10 +68,11 @@ def optimize_classes(serie, df_income):
         
 def main():
     df = pd.read_csv('files/clean.csv')
-    df_income = df['income']
-    df_classes, khisq, pval, ddl, conv = optimize_classes(df['hours-per-week'], df_income)
-    print(df_classes, khisq, pval, ddl, conv)
-    df_classes.to_csv(f'files/classes_opti_{df_classes.name}.csv', index=False)
+    print(generate_classes(df['age']))
+    # df_income = df['income']
+    # df_classes, khisq, pval, ddl, conv = optimize_classes(df['hours-per-week'], df_income)
+    # print(df_classes, khisq, pval, ddl, conv)
+    # df_classes.to_csv(f'files/classes_opti_{df_classes.name}.csv', index=False)
 
 
 if __name__ == "__main__":
