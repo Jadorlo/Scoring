@@ -69,14 +69,14 @@ def optimize_classes(serie, df_income, bins):
 
 def test(khisq, pval, df_income):
     df0 = pd.read_csv('files/clean.csv')
-    df1 = pd.read_csv('files/classes_opti_age.csv')
+    df1 = pd.read_csv('files/files_classes_opti/classes_opti_alexander_age.csv')
     serie_originale = df0['age']
     serie_classe_actuelle = df1['age']
     table_actuelle = pd.crosstab(serie_classe_actuelle, df_income)
     khi_act, pval_act, ddl, contigent_theo = chi2_contingency(table_actuelle)
     if (khisq > khi_act) and (pval<=pval_act):
         df = pd.concat([serie_classe_actuelle,serie_originale], axis=1)
-        df.to_csv(f'files/classes_opti_{serie_classe_actuelle.name}.csv', columns=['classe_age', 'age_quanti'], index=False)
+        df.to_csv(f'files/files_classes_opti/classes_opti_alexander_{serie_classe_actuelle.name}.csv', columns=['classe_age', 'age_quanti'], index=False)
         return True
     else:
         return False
