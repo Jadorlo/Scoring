@@ -31,6 +31,22 @@ def pieplot(df):
     file = args.filename.split('.')[0].split('/')[-1]
     plt.savefig(f'images/piecharts_{file}.png')
 
+def histogram(df):
+    """
+    """
+    columns = df.select_dtypes(include='int64').columns
+    fig, axs = plt.subplots(2, 2, figsize=(15,10))
+    for k, col in enumerate(columns):
+        axs[k%2, k//2].hist(df[col], bins=10)
+        axs[k%2, k//2].set_title(col.upper())
+    
+    plt.tight_layout()
+    fig.suptitle('Dsitribution des variables qualitatives')
+    file = args.filename.split('.')[0].split('/')[-1]
+    plt.savefig(f'images/histogram_{file}.png')
+    plt.show()
+
+
     
 
 
@@ -39,6 +55,7 @@ def main():
     df = pd.read_csv(args.filename)
     # boxplot(df)
     # pieplot(df)
+    histogram(df)
 
 if __name__ == "__main__":
     main()
