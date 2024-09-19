@@ -21,7 +21,7 @@ def Create_Train_Test(df):
     y = df.pop('income')
     y = pd.get_dummies(y)['>50K']
     X = pd.get_dummies(df)
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state=0)
 
     return X_train, X_test, y_train, y_test
 
@@ -47,8 +47,7 @@ def DecisionTree(X_train, y_train):
     """
     Créer l'arbre de décision grâce aux datasets d'entraînement
     """
-    #print(Tracking_Dataframe(params, False))
-    model = tree.DecisionTreeClassifier(max_depth=4).fit(X_train, y_train)
+    model = tree.DecisionTreeClassifier(criterion='entropy', max_leaf_nodes=20).fit(X_train, y_train)
     return model
 
 def Evaluation(model, X_test, y_test, isLogit):
@@ -70,8 +69,8 @@ def Evaluation(model, X_test, y_test, isLogit):
                                       'Importance':model.feature_importances_}).sort_values(by='Importance',
                                                                                             ascending=False, ignore_index=True)
         print(df_importance.loc[df_importance['Importance']!=0])
-        #tree.plot_tree(model, feature_names= list(X_test.columns) , filled=True)
-        #plt.savefig(f'images/Tree_{file}.pdf')
+        tree.plot_tree(model, feature_names= list(X_test.columns), filled=True)
+        plt.savefig(f'images/Tree_{file}.pdf')
 
     print('Matrice de confusion:\n', confusion_matrix(y_test, predict_Y))
     Accuracy = model.score(X_test,y_test)
