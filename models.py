@@ -1,7 +1,8 @@
 import pandas as pd
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import confusion_matrix, classification_report, auc, roc_curve, f1_score, matthews_corrcoef
+from sklearn import tree
+from sklearn.metrics import confusion_matrix, classification_report, auc, roc_curve, matthews_corrcoef
 import argparse
 import numpy as np
 import matplotlib.pyplot as plt
@@ -11,16 +12,14 @@ parser = argparse.ArgumentParser()
 parser.add_argument('filename')
 args = parser.parse_args()
 
-def Create_Train_Test(df):
+def Create_Train_Test(df, is_x_dummies):
     """
     Créer les dataframes de test et d'entraînement 
     """
     y = df.pop('income')
     y = pd.get_dummies(y)['>50K']
     X = pd.get_dummies(df)
-
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2)
-    print(X_train.columns)
 
     return X_train, X_test, y_train, y_test
 
@@ -36,18 +35,23 @@ def Drop_References_Variables(X_train, X_test, vars):
 
 def Logistic_Regression(X_train, y_train):
     """
-    Créer le modèle grâce aux datasets d'entraînement
+    Crée le Logit grâce aux datasets d'entraînement
     """
     model = LogisticRegression(random_state = 0).fit(X_train, y_train)
 
     return model
 
-def Evaluation(model, X_test, y_test):
+def DecisionTree(X_train, y_train):
+    """
+    Créer l'arbre de décision grâce aux datasets d'entraînement
+    """
+    model = tree.DecisionTreeClassifier(random_state=0).fit(X_train, y_train)
+    return model
+
+def EvaluationLogit(model, X_test, y_test):
     """
     Affiche les résultats du modèle avec les datasets de test
     """
-    file = args.filename.split('.')[0].split('/')[-1]
-
     predict_Y = model.predict(X_test)
     print('Intercept', model.intercept_)
     df_coefficents = pd.DataFrame({'Variables':model.feature_names_in_,
@@ -61,6 +65,21 @@ def Evaluation(model, X_test, y_test):
     f1_score = class_report.loc['f1-score']['True']
     MCC = matthews_corrcoef(y_test, predict_Y)
     print('Matrice de confusion :\n', confusion_matrix(y_test, predict_Y))
+    AUC = ROC(model, X_test, y_test, isLogit=True)
+
+    df_metrics = pd.DataFrame({'Valeur':[AUC, f1_score, Accuracy, MCC],
+                               'Cible':[0.8, 0.75, 0.85, 0.75]},
+                               index = ['AUC', 'F1-Score', 'Accuracy', 'MCC'])
+    return df_metrics
+
+def ROC(model, X_test, y_test, isLogit):
+    """
+    """
+    if isLogit:
+        file = args.filename.split('.')[0].split('/')[-1]+'_Logit'
+    else:
+        file = args.filename.split('.')[0].split('/')[-1]+'_Tree' 
+
     FER, TER, threshold = roc_curve(y_test, model.predict_proba(X_test)[:,1])
     AUC = auc(FER,TER)
 
@@ -73,10 +92,7 @@ def Evaluation(model, X_test, y_test):
     plt.savefig(f'images/ROC_{file}.png')
     # plt.show()
 
-    df_metrics = pd.DataFrame({'Valeur':[AUC, f1_score, Accuracy, MCC],
-                               'Cible':[0.8, 0.75, 0.85, 0.75]},
-                               index = ['AUC', 'F1-Score', 'Accuracy', 'MCC'])
-    return df_metrics
+    return AUC
 
 def Scoring(df_metrics):
     """
@@ -92,16 +108,33 @@ def Scoring(df_metrics):
     score = df_metrics.apply(lambda row : 1 if row['Valeur'] > row['Cible'] else 0, axis=1).sum()
     print('Score du Logit:', score)
 
-def main():
-    df = pd.read_csv(args.filename)
-    X_train, X_test, y_train, y_test = Create_Train_Test(df)
+def LOGIT(df):
+    #### LOGIT ####
+    X_train, X_test, y_train, y_test = Create_Train_Test(df, True)
     vars = ['native-country_United-States', 'workclass_Private', 'occupation_Prof-specialty', 
             'gender_Male', 'education_HS-grad', 'relationship_Husband', 'marital-status_Married-civ-spouse',
             'race_White']
     refs_vars, X_train, X_test = Drop_References_Variables(X_train, X_test, vars)
-    model = Logistic_Regression(X_train, y_train)
-    df_metrics = Evaluation(model, X_test, y_test)
-    Scoring(df_metrics)
+    model_logit = Logistic_Regression(X_train, y_train)
+    df_metrics_logit = Evaluation(model_logit, X_test, y_test)
+    Scoring(df_metrics_logit)
+    ###############
+
+def TREE(df):
+    #### TREE #####
+    X_train, X_test, y_train, y_test = Create_Train_Test(df, False)
+    model_decision_tree = DecisionTree(X_train, y_train)
+    df_metrics_tree = Evaluation(model_decision_tree, X_test, y_test)
+    Scoring(df_metrics_tree)
+    ###############
+
+def main():
+
+    df = pd.read_csv(args.filename)
+    TREE(df)
+
+
+
     
 
 
