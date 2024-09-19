@@ -5,12 +5,14 @@ from sklearn import tree
 from sklearn.metrics import confusion_matrix, classification_report, auc, roc_curve, matthews_corrcoef
 import argparse
 import numpy as np
+from datetime import datetime
 import matplotlib.pyplot as plt
 
 
 parser = argparse.ArgumentParser()
 parser.add_argument('filename')
 args = parser.parse_args()
+
 
 def Create_Train_Test(df):
     """
@@ -25,7 +27,7 @@ def Create_Train_Test(df):
 
 def Drop_References_Variables(X_train, X_test, vars):
     """
-    
+    Drop les variables de référence pour le modèle Logit
     """
     refs_vars = X_train[vars].copy()
     X_train.drop(vars, axis=1, inplace=True)
@@ -45,14 +47,14 @@ def DecisionTree(X_train, y_train):
     """
     Créer l'arbre de décision grâce aux datasets d'entraînement
     """
-    model = tree.DecisionTreeClassifier(max_leaf_nodes=10,
-                                        min_samples_leaf=10,
-                                        min_samples_split=30).fit(X_train, y_train)
+    #print(Tracking_Dataframe(params, False))
+    model = tree.DecisionTreeClassifier(max_depth=4).fit(X_train, y_train)
     return model
 
 def Evaluation(model, X_test, y_test, isLogit):
     """
     Affiche les résultats du modèle avec les datasets de test
+    Différenciation entre Logit et arbre de décision
     """
     file = args.filename.split('.')[0].split('/')[-1]
     predict_Y = model.predict(X_test)
@@ -68,8 +70,10 @@ def Evaluation(model, X_test, y_test, isLogit):
                                       'Importance':model.feature_importances_}).sort_values(by='Importance',
                                                                                             ascending=False, ignore_index=True)
         print(df_importance.loc[df_importance['Importance']!=0])
-        tree.plot_tree(model, feature_names= list(X_test.columns) , filled=True)
-        plt.savefig(f'images/Tree_{file}.pdf')
+        #tree.plot_tree(model, feature_names= list(X_test.columns) , filled=True)
+        #plt.savefig(f'images/Tree_{file}.pdf')
+
+    print('Matrice de confusion:\n', confusion_matrix(y_test, predict_Y))
     Accuracy = model.score(X_test,y_test)
     class_report = classification_report(y_test, predict_Y, output_dict=True)
     class_report = pd.DataFrame(class_report)
@@ -77,14 +81,15 @@ def Evaluation(model, X_test, y_test, isLogit):
     MCC = matthews_corrcoef(y_test, predict_Y)
     AUC = ROC(model, X_test, y_test, isLogit)
 
-    df_metrics = pd.DataFrame({'Valeur':[AUC, f1_score, Accuracy, MCC],
-                               'Cible':[0.8, 0.75, 0.85, 0.75]},
-                               index = ['AUC', 'F1-Score', 'Accuracy', 'MCC'])
+    df_metrics = pd.DataFrame({'Valeur':[AUC, f1_score, Accuracy, MCC, None],
+                               'Cible':[0.8, 0.75, 0.85, 0.75, None]},
+                               index = ['AUC', 'F1-Score', 'Accuracy', 'MCC', 'gAUC'])
     return df_metrics
 
 
 def ROC(model, X_test, y_test, isLogit):
     """
+    Charge la courbe roc du modèle et retourne l'AUC
     """
     if isLogit:
         file = args.filename.split('.')[0].split('/')[-1]+'_Logit'
@@ -107,7 +112,7 @@ def ROC(model, X_test, y_test, isLogit):
 
 def Scoring(df_metrics, isLogit):
     """
-    
+    Calcul le score du modèle en fonction des métriques de df_metrics
     """
     if isLogit:
         model = 'Logit'
@@ -118,9 +123,28 @@ def Scoring(df_metrics, isLogit):
     print(df_metrics)
     score = df_metrics.apply(lambda row : 1 if row['Valeur'] > row['Cible'] else 0, axis=1).sum()
     print(f'Score du {model}:', score)
+    return df_metrics, score
+
+def Tracking_Dataframe(params, df_metrics_tree, score, isLogit):
+    """
+    """
+    now = datetime.now()
+    if not isLogit:
+        df_tracking = pd.DataFrame([{'Date':now.strftime("%d/%m/%Y %H:%M:%S"), 'Score':score}])
+        df_tracking[df_metrics_tree.index] = df_metrics_tree['Valeur'].T
+        df_tracking_columns = df_tracking.columns
+        df_params = pd.DataFrame([params], columns=list(params.keys()))
+        df_tracking = pd.concat([df_tracking, df_params], axis=1)
+        new_index = df_tracking_columns.insert(1, df_params.columns)
+        df_tracking = df_tracking.reindex(columns=new_index)
+        df_tracking.index.name = "index"
+        df_tracking.to_csv('files/tracking_models_files/tracking_decision_tree.csv', mode='a', header=False)
+    return df_tracking
+
 
 def LOGIT(df):
     """
+    Réunion des fonctions nécessaires au fonctionnement du modèle LOGIT
     """
     X_train, X_test, y_train, y_test = Create_Train_Test(df)
     vars = ['native-country_United-States', 'workclass_Private', 'occupation_Prof-specialty', 
@@ -133,11 +157,16 @@ def LOGIT(df):
 
 def TREE(df):
     """
+    Réunion des fonctions nécessaires au fonctionnement du modèle Arbre de Décision
     """
     X_train, X_test, y_train, y_test = Create_Train_Test(df)
     model_decision_tree = DecisionTree(X_train, y_train)
     df_metrics_tree = Evaluation(model_decision_tree, X_test, y_test, False)
-    Scoring(df_metrics_tree, False)
+    df_metrics_tree, score = Scoring(df_metrics_tree, False)
+
+    df_tracking = Tracking_Dataframe(model_decision_tree.get_params(), df_metrics_tree, score, False)
+
+    
 
 def main():
 

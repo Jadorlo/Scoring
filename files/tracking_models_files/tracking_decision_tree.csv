@@ -1,0 +1,2 @@
+index,Date,ccp_alpha,class_weight,criterion,max_depth,max_features,max_leaf_nodes,min_impurity_decrease,min_samples_leaf,min_samples_split,min_weight_fraction_leaf,monotonic_cst,random_state,splitter,Score,AUC,F1-Score,Accuracy,MCC,gAUC
+0,19/09/2024 21:50:03,0.0,,gini,4,,,0.0,1,2,0.0,,,best,1,0.8497371508647613,0.5487768936044798,0.830735212824765,0.49082101123668775,
