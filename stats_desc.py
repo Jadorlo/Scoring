@@ -10,6 +10,8 @@ parser = argparse.ArgumentParser()
 parser.add_argument('filename')
 args = parser.parse_args()
 
+#plt.rcParams['text.usetex'] = True
+
 def boxplot(df):
     """
     
@@ -57,40 +59,31 @@ def zscore(df, col, delete:bool):
 
     mean = df[col].mean()
     std = df[col].std()
+    #print(mean, std)
 
     normalized_df = (df[col]-mean)/std
-    normalized_list = normalized_df.to_list()
+    X0 = normalized_df.to_list()
+    #print(np.mean(X0), np.std(X0))
 
-    mean_norm = normalized_df.mean()
-    std_norm = normalized_df.std()
-    min = normalized_df.min()
-    max = normalized_df.max()
-
-    print(min, max)
-    X1 = np.linspace(min, max, 45222)
-    Y1 = 1/np.sqrt(2*np.pi)*np.exp(-1/2*((X1-mean_norm)/std_norm)**2)
+    X1 = np.linspace(np.min(X0), np.max(X0), len(X0))
     
-    #Y2 = norm.pdf(normalized_list, mean, std)
-    
-    borne_min, borne_max= mean-3*std, mean+3*std
-    is_in = ['blue' if borne_min <= x <= borne_max else 'red' for x in normalized_list]
+    borne_min, borne_max= np.mean(X0)-3*np.std(X0), np.mean(X0)+3*np.std(X0)
+    #print(borne_min, borne_max)
+    Y1 = []
+    for x in X1:
+        Y1.append(1/(np.sqrt(2*np.pi))*np.exp(-1/2*x**2))
 
-
-    x = np.linspace(mean - 4 * std, mean + 4 * std, 1000)
-    x = (x-x.mean())/x.std()
-    y = norm.pdf(x, x.mean(), x.std())
-
-
-    plt.figure(figsize=(10, 6))
-    #plt.plot(x, y, label='Densité', color='black')
-    plt.vlines(3, ymin =-0.11, ymax=0.46, color='red')
-    plt.scatter(normalized_list, Y1, alpha=0.1)
-    plt.ylim((0, 0.4))
+    is_in = ['blue' if borne_min <= x <= borne_max else 'red' for x in X1]
+    #print(pd.DataFrame({'X':X0, 'IN':is_in}))
+    #print(is_in)
+    plt.title(col.upper())
+    plt.grid()
+    plt.scatter(X1, Y1, c=is_in, alpha=0.25, s=1)
+    plt.annotate(r'> 3$\sigma$', xy=((np.max(X1)+3)/2,0.25), color="red")
+    plt.vlines(3, ymin=-0.1, ymax=0.5, color='black')
+    plt.ylim((-0.1,0.41))
+    plt.savefig(f'images/zscore_density_{col}.pdf')
     plt.show()
-    
-    
-
-    
 
 
 
@@ -99,7 +92,8 @@ def main():
     # boxplot(df)
     # pieplot(df)
     # histogram(df)
-    zscore(df, 'age', False)
+    for col in ['age', 'hours-per-week', 'capital-gain', 'capital-loss']:
+        zscore(df, col, False)
 
 if __name__ == "__main__":
     main()
