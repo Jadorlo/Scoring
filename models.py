@@ -70,7 +70,7 @@ def Evaluation(model, X_test, y_test, isLogit):
                                                                                             ascending=False, ignore_index=True)
         print(df_importance.loc[df_importance['Importance']!=0])
         tree.plot_tree(model, feature_names= list(X_test.columns), filled=True)
-        plt.savefig(f'images/Tree_{file}.pdf')
+        plt.savefig(f'images/Trees/Tree_{file}.pdf')
 
     print('Matrice de confusion:\n', confusion_matrix(y_test, predict_Y))
     Accuracy = model.score(X_test,y_test)
@@ -104,7 +104,7 @@ def ROC(model, X_test, y_test, isLogit):
     plt.annotate(f'AUC:{round(AUC, 2)}', (0.7,0.3))
     plt.title('Courbe ROC et AUC')
     plt.grid()
-    plt.savefig(f'images/ROC_{file}.png')
+    plt.savefig(f'images/ROC/ROC_{file}.png')
     # plt.show()
 
     return AUC
@@ -162,7 +162,6 @@ def TREE(df):
     model_decision_tree = DecisionTree(X_train, y_train)
     df_metrics_tree = Evaluation(model_decision_tree, X_test, y_test, False)
     df_metrics_tree, score = Scoring(df_metrics_tree, False)
-
     df_tracking = Tracking_Dataframe(model_decision_tree.get_params(), df_metrics_tree, score, False)
 
     
