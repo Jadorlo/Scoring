@@ -129,7 +129,7 @@ def Tracking_Dataframe(params, df_metrics_tree, score, isLogit):
     """
     now = datetime.now()
     if not isLogit:
-        df_tracking = pd.DataFrame([{'Date':now.strftime("%d/%m/%Y %H:%M:%S"), 'Score':score}])
+        df_tracking = pd.DataFrame([{'Date':now.strftime("%d/%m/%Y %H:%M:%S"), 'Score':score, 'File':args.filename.split('/')[-1].split('.')[0]}])
         df_tracking[df_metrics_tree.index] = df_metrics_tree['Valeur'].T
         df_tracking_columns = df_tracking.columns
         df_params = pd.DataFrame([params], columns=list(params.keys()))

@@ -18,11 +18,22 @@ def drop_columns(df):
 
     return df
 
+def apply_classes(df):
+
+    serie_age = pd.read_csv('files/files_classes_opti/classes_opti_alexander_age.csv')
+    serie_hpw = pd.read_csv('files/files_classes_opti/classes_opti_alexander_hours-per-week.csv') 
+    df_classes_opti = pd.concat([serie_age, serie_hpw], axis=1)
+    df_classes_opti.columns = ['age_opti', 'hours-per-week_opti']
+    print(df_classes_opti)
+    df = pd.concat([df, df_classes_opti], axis=1)
+    df.drop(['age', 'hours-per-week'], inplace=True, axis=1)
+    return df
 
 
-def main():
+
+def main_clean():
     """
-    
+    Renvoie un dataframe sans valeurs manquantes ni colonnes inutiles
     """
     df = pd.read_csv('files/revenus.csv')
     df = drop_columns(df)
@@ -30,4 +41,11 @@ def main():
     df.reset_index(inplace=True, drop=True)
     df.to_csv('files/clean.csv', index=False)
 
-main()
+def main_clean_classes():
+    """
+    Renvoie le dataframe clean avec l'application des classes optimiser sur age et sur hours-per-week
+    """
+    df = pd.read_csv('files/clean.csv')
+    apply_classes(df)
+
+main_clean_classes()
