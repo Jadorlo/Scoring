@@ -14,7 +14,7 @@ args = parser.parse_args()
 
 def boxplot(df):
     """
-    
+    Affiche les boxplots des variables quantitatives
     """
     plt.figure()
     df.plot(kind='box', subplots=True, figsize=(22,6))
@@ -23,7 +23,7 @@ def boxplot(df):
 
 def pieplot(df):
     """
-    
+    Affiche les proportions des classes des variables qualitatives
     """
     columns = df.select_dtypes(include='object').columns
     fig, axs = plt.subplots(3, 3, figsize=(15,15))
@@ -39,6 +39,7 @@ def pieplot(df):
 
 def histogram(df):
     """
+    Affiche les histogrammes des variables quantitatives
     """
     columns = df.select_dtypes(include='int64').columns
     fig, axs = plt.subplots(2, 2, figsize=(15,10))
@@ -52,46 +53,10 @@ def histogram(df):
     plt.savefig(f'images/histogram_{file}.png')
     plt.show()
 
-def zscore(df, col, delete:bool):
+def zscore(serie, delete):
     """
-    
-    """
-
-    mean = df[col].mean()
-    std = df[col].std()
-    #print(mean, std)
-
-    normalized_df = (df[col]-mean)/std
-    X0 = normalized_df.to_list()
-    #print(np.mean(X0), np.std(X0))
-
-    X1 = np.linspace(np.min(X0), np.max(X0), len(X0))
-    
-    borne_minX0, borne_maxX0= mean-3*std, mean+3*std
-    borne_minX1, borne_maxX1= np.mean(X0)-3*np.std(X0), np.mean(X0)+3*np.std(X0)
-
-    #print(borne_min, borne_max)
-    Y1 = []
-    for x in X1:
-        Y1.append(1/(np.sqrt(2*np.pi))*np.exp(-1/2*x**2))
-
-    is_in = ['blue' if borne_minX1 <= x <= borne_maxX1 else 'red' for x in X1]
-    nb_out = sum(map(lambda x: (x<borne_minX0)|(x>borne_maxX0), X0))
-    prc_out = nb_out/len(X0)
-
-    print(pd.DataFrame({'X':X0, 'IN':is_in}))
-
-    plt.title(col.upper())
-    plt.grid()
-    plt.scatter(X1, Y1, c=is_in, alpha=0.25, s=1)
-    plt.annotate(f'> 3$\sigma$ \n Nb={nb_out} \n %={round(prc_out, 2)*100}', xy=((np.max(X1)+2.5)/2,0.25), color="red")
-    plt.vlines(3, ymin=-0.1, ymax=0.5, color='black')
-    plt.ylim((-0.1,0.41))
-    plt.savefig(f'images/zscore_density_{col}.pdf')
-    plt.show()
-
-def zscore2(serie, delete):
-    """
+    Affiche la loi normale de la distribution de la variable.
+    Indique quels individus seraient supprimés en appliquant le Zscore
     """
     mean = serie.mean()
     std = serie.std()
@@ -118,6 +83,11 @@ def zscore2(serie, delete):
     plt.savefig(f'images/zscore_density_{serie.name}.pdf')
     plt.show()
 
+def V_Cramer_matrix(df):
+    """
+    """
+    pass
+
 
 def main():
     df = pd.read_csv(args.filename)
@@ -125,8 +95,7 @@ def main():
     # pieplot(df)
     # histogram(df)
     for col in ['age', 'hours-per-week', 'capital-gain', 'capital-loss']:
-        zscore2(df[col], False)
-    #zscore2(df['age'], False)
+        zscore(df[col], False)
 
 
 if __name__ == "__main__":
