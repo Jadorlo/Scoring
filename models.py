@@ -47,7 +47,7 @@ def DecisionTree(X_train, y_train):
     """
     Créer l'arbre de décision grâce aux datasets d'entraînement
     """
-    model = tree.DecisionTreeClassifier(criterion='entropy', max_leaf_nodes=40).fit(X_train, y_train)
+    model = tree.DecisionTreeClassifier(criterion='entropy', max_leaf_nodes=30).fit(X_train, y_train)
     return model
 
 def Evaluation(model, X_test, y_test, isLogit):
@@ -140,7 +140,7 @@ def Tracking_Dataframe(params, df_metrics, score, isLogit):
     if not isLogit:
         df_tracking.to_csv('files/tracking_models_files/tracking_decision_tree.csv', mode='a', header=False)
     else:
-        df_tracking.to_csv('files/tracking_models_files/tracking_logit.csv', mode='a', header=True)
+        df_tracking.to_csv('files/tracking_models_files/tracking_logit.csv', mode='a', header=False)
     return df_tracking
 
 
@@ -174,7 +174,7 @@ def TREE(df):
 def main():
 
     df = pd.read_csv(args.filename)
-    LOGIT(df)
+    TREE(df)
 
 if __name__ == "__main__":
     main()

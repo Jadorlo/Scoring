@@ -76,3 +76,25 @@ plt.grid()
 plt.title("Train Test Scores en fonction du ccp_alpha")
 plt.savefig(f'images/hyperparameters/Train_Test_ccp_alpha_{file}.pdf')
 plt.show()
+
+
+
+#### MAX LEAF NODES #####
+
+train_scores = []
+test_scores = []
+max_leafs = np.arange(2, 100, 1)
+
+for max_leaf in max_leafs:
+    model = tree.DecisionTreeClassifier(max_leaf_nodes=max_leaf).fit(X_train, y_train)
+    train_scores.append(model.score(X_train, y_train))
+    test_scores.append(model.score(X_test, y_test))
+
+plt.figure()
+plt.plot(max_leafs, train_scores, c='green', label='Train Score')
+plt.plot(max_leafs, test_scores, c='red', label='Test Score')
+plt.legend()
+plt.grid()
+plt.title("Train Test Scores en fonction du nombre maximum de feuilles")
+plt.savefig(f'images/hyperparameters/Train_Test_max_leaf_nodes_{file}.pdf')
+plt.show()

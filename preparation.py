@@ -59,6 +59,8 @@ def main_clean():
     df.reset_index(inplace=True, drop=True)
     df.to_csv('files/clean.csv', index=False)
 
+
+
 def main_clean_classes():
     """
     Renvoie le dataframe clean avec l'application des classes optimisées sur age et sur hours-per-week,
@@ -69,4 +71,8 @@ def main_clean_classes():
     df = classes_manuelles(df)
     df.to_csv('files/clean_classes_V0.csv')
 
-main_clean_classes()
+#main_clean_classes()
+
+df = pd.read_csv('files/clean.csv')
+df = apply_opti_classes(df)
+df.to_csv('files/clean_classes_V1.csv')

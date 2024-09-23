@@ -71,7 +71,7 @@ def zscore(serie, delete):
     nb_out = len(df_master['Is_inX0']) - df_master['Is_inX0'].sum()
     prc_out = nb_out/len(df_master)
     
-    #print(df_master.loc[df_master['X0']>3])
+    print(df_master.loc[df_master['X0']>3])
    
     plt.figure()
     plt.title(label=serie.name.upper())
@@ -80,7 +80,7 @@ def zscore(serie, delete):
     plt.annotate(f'x<-3$\sigma$\n ou x>3$\sigma$ \n Nb={nb_out} \n %={round(prc_out, 3)*100}', xy=((df_master['X0'].max()+2.5)/2,0.25), color="red")
     plt.vlines(3, ymin=-0.1, ymax=0.5, color='black')
     plt.ylim((-0.1,0.41))
-    plt.savefig(f'images/Z-Scores/zscore_density_{serie.name}.pdf')
+    plt.savefig(f'images/Z-Score/zscore_density_{serie.name}.pdf')
     plt.show()
 
 def V_Cramer_matrix(df):
@@ -117,7 +117,7 @@ def main():
     # pieplot(df)
     # histogram(df)
     # for col in ['age', 'hours-per-week', 'capital-gain', 'capital-loss']:
-    #     zscore(df[col], False)
+    #   zscore(df[col], False)
     capital_without_0(df)
 
 
