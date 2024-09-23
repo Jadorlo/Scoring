@@ -88,14 +88,37 @@ def V_Cramer_matrix(df):
     """
     pass
 
+def capital_without_0(df):
+    """
+    """
+    serie_gain = df['capital-gain'].loc[df['capital-gain']>0]
+    serie_loss = df['capital-loss'].loc[df['capital-loss']>0]
+    print(len(serie_gain))
+    print(len(serie_loss))
+    
+    fig, axs = plt.subplots(2, 1, figsize=(15,10))
+    
+    axs[1].hist(serie_gain, bins=10)
+    axs[1].set_title(serie_gain.name.upper())
+    
+    axs[0].hist(serie_loss, bins=10)
+    axs[0].set_title(serie_loss.name.upper())
+
+    plt.tight_layout()
+    fig.suptitle('Dsitribution des variables qualitatives')
+    file = args.filename.split('.')[0].split('/')[-1]
+    #plt.savefig(f'images/histogram_{file}.png')
+    plt.show()
+
 
 def main():
     df = pd.read_csv(args.filename)
     # boxplot(df)
     # pieplot(df)
     # histogram(df)
-    for col in ['age', 'hours-per-week', 'capital-gain', 'capital-loss']:
-        zscore(df[col], False)
+    # for col in ['age', 'hours-per-week', 'capital-gain', 'capital-loss']:
+    #     zscore(df[col], False)
+    capital_without_0(df)
 
 
 if __name__ == "__main__":
