@@ -47,7 +47,7 @@ def DecisionTree(X_train, y_train):
     """
     Créer l'arbre de décision grâce aux datasets d'entraînement
     """
-    model = tree.DecisionTreeClassifier(criterion='entropy', max_leaf_nodes=30).fit(X_train, y_train)
+    model = tree.DecisionTreeClassifier(criterion='gini', max_leaf_nodes=30).fit(X_train, y_train)
     return model
 
 def Evaluation(model, X_test, y_test, isLogit):
@@ -130,7 +130,9 @@ def Tracking_Dataframe(params, df_metrics, score, isLogit):
     now = datetime.now()
     
     df_tracking = pd.DataFrame([{'Date':now.strftime("%d/%m/%Y %H:%M:%S"), 'Score':score, 'File':args.filename.split('/')[-1].split('.')[0]}])
+    #print([f'{i}_cible' for i in df_metrics.index.tolist()])
     df_tracking[df_metrics.index] = df_metrics['Valeur'].T
+    df_tracking[[f'{i}_cible' for i in df_metrics.index.tolist()]] = df_metrics['Cible'].T
     df_tracking_columns = df_tracking.columns
     df_params = pd.DataFrame([params], columns=list(params.keys()))
     df_tracking = pd.concat([df_tracking, df_params], axis=1)
@@ -138,9 +140,11 @@ def Tracking_Dataframe(params, df_metrics, score, isLogit):
     df_tracking = df_tracking.reindex(columns=new_index)
     df_tracking.index.name = "index"
     if not isLogit:
+        pass
         df_tracking.to_csv('files/tracking_models_files/tracking_decision_tree.csv', mode='a', header=False)
     else:
         df_tracking.to_csv('files/tracking_models_files/tracking_logit.csv', mode='a', header=False)
+        pass
     return df_tracking
 
 
