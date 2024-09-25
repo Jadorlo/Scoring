@@ -26,11 +26,12 @@ def pieplot(df):
     Affiche les proportions des classes des variables qualitatives
     """
     columns = df.select_dtypes(include='object').columns
-    fig, axs = plt.subplots(3, 3, figsize=(15,15))
+    fig, axs = plt.subplots(4, 4, figsize=(15,15))
     for k, col in enumerate(columns):
         df_prop = df[col].value_counts()
-        axs[k%3, k//3].pie(x=df_prop, labels = df_prop.index, autopct='%1.1f%%', labeldistance=1.1)
-        axs[k%3, k//3].set_title(col.upper())
+        print(df_prop)
+        axs[k%4, k//4].pie(x=df_prop, labels = df_prop.index, autopct='%1.1f%%', labeldistance=1.1)
+        axs[k%4, k//4].set_title(col.upper())
     
     plt.tight_layout()
     fig.suptitle('Proportion des variables qualitatives')
@@ -114,11 +115,11 @@ def capital_without_0(df):
 def main():
     df = pd.read_csv(args.filename)
     # boxplot(df)
-    # pieplot(df)
+    pieplot(df)
     # histogram(df)
     # for col in ['age', 'hours-per-week', 'capital-gain', 'capital-loss']:
     #   zscore(df[col], False)
-    capital_without_0(df)
+    #capital_without_0(df)
 
 
 if __name__ == "__main__":

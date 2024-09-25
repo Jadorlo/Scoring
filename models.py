@@ -39,7 +39,7 @@ def Logistic_Regression(X_train, y_train):
     """
     Crée le Logit grâce aux datasets d'entraînement
     """
-    model = LogisticRegression(random_state = 0).fit(X_train, y_train)
+    model = LogisticRegression(random_state = 0, fit_intercept=True).fit(X_train, y_train)
 
     return model
 
@@ -47,7 +47,7 @@ def DecisionTree(X_train, y_train):
     """
     Créer l'arbre de décision grâce aux datasets d'entraînement
     """
-    model = tree.DecisionTreeClassifier(criterion='gini', max_leaf_nodes=30).fit(X_train, y_train)
+    model = tree.DecisionTreeClassifier(ccp_alpha=0.0001 ,criterion='gini', max_leaf_nodes=30).fit(X_train, y_train)
     return model
 
 def Evaluation(model, X_test, y_test, isLogit):
@@ -65,12 +65,13 @@ def Evaluation(model, X_test, y_test, isLogit):
                                     'Odd-Ratios':np.exp(model.coef_[0])})
         print(df_coefficents.to_string())
     else:
+        criterion = model.get_params()['criterion']
         df_importance = pd.DataFrame({'Variables':names,
                                       'Importance':model.feature_importances_}).sort_values(by='Importance',
                                                                                             ascending=False, ignore_index=True)
         print(df_importance.loc[df_importance['Importance']!=0])
         tree.plot_tree(model, feature_names= list(X_test.columns), filled=True)
-        plt.savefig(f'images/Trees/Tree_{file}.pdf')
+        plt.savefig(f'images/Trees/Tree_{criterion}_{file}.pdf')
 
     print('Matrice de confusion:\n', confusion_matrix(y_test, predict_Y))
     Accuracy = model.score(X_test,y_test)
@@ -132,7 +133,8 @@ def Tracking_Dataframe(params, df_metrics, score, isLogit):
     df_tracking = pd.DataFrame([{'Date':now.strftime("%d/%m/%Y %H:%M:%S"), 'Score':score, 'File':args.filename.split('/')[-1].split('.')[0]}])
     #print([f'{i}_cible' for i in df_metrics.index.tolist()])
     df_tracking[df_metrics.index] = df_metrics['Valeur'].T
-    df_tracking[[f'{i}_cible' for i in df_metrics.index.tolist()]] = df_metrics['Cible'].T
+    df_cible = df_metrics['Cible'].T
+    df_tracking[[f'{i}_cible' for i in df_metrics.index.tolist()]] = df_cible
     df_tracking_columns = df_tracking.columns
     df_params = pd.DataFrame([params], columns=list(params.keys()))
     df_tracking = pd.concat([df_tracking, df_params], axis=1)
@@ -153,12 +155,12 @@ def LOGIT(df):
     Réunion des fonctions nécessaires au fonctionnement du modèle LOGIT
     """
     X_train, X_test, y_train, y_test = Create_Train_Test(df)
-    vars = ['native-country_United-States', 'workclass_Private', 'occupation_Prof-specialty', 
+    print(X_train.columns)
+    vars = ['native-country_United-States', 'workclass_Private', 'occupation_Occupation:Mid-income', 
             'gender_Male', 'education_HS-grad', 'relationship_Husband', 'marital-status_Married-civ-spouse',
-            'race_White']
+            'race_White', 'age_opti_(28.0, 35.0]', 'hours-per-week_opti_(39.0, 43.0]']
     refs_vars, X_train, X_test = Drop_References_Variables(X_train, X_test, vars)
     model_logit = Logistic_Regression(X_train, y_train)
-    print(model_logit.get_params())
     df_metrics_logit = Evaluation(model_logit, X_test, y_test, True)
     df_metrics_logit, score = Scoring(df_metrics_logit, True)
     df_tracking = Tracking_Dataframe(model_logit.get_params(), df_metrics_logit, score, True)
@@ -178,7 +180,7 @@ def TREE(df):
 def main():
 
     df = pd.read_csv(args.filename)
-    TREE(df)
+    LOGIT(df)
 
 if __name__ == "__main__":
     main()

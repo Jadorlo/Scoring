@@ -98,14 +98,14 @@ def main_clean_classes_V0():
     df = pd.read_csv('files/clean.csv')
     df = apply_opti_classes(df)
     df = classes_manuelles(df)
-    df.to_csv('files/clean_classes_V0.csv')
+    df.to_csv('files/clean_classes_V0.csv', index=False)
 
 def main_clean_classes_V1():
     """
     """
     df = pd.read_csv('files/clean.csv')
     df = apply_opti_classes(df)
-    df.to_csv('files/clean_classes_V1.csv')
+    df.to_csv('files/clean_classes_V1.csv', index=False)
 
 def main_clean_classes_V2():
     """
@@ -113,6 +113,6 @@ def main_clean_classes_V2():
     df = pd.read_csv('files/clean.csv')
     df = apply_opti_classes(df)
     df = regroupement(df)
-    df.to_csv('files/clean_classes_V2.csv')
+    df.to_csv('files/clean_classes_V2.csv', index=False)
 
-main_clean_classes_V2()
+main_clean_classes_V1()
