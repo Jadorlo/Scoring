@@ -7,6 +7,7 @@ import argparse
 import numpy as np
 from datetime import datetime
 import matplotlib.pyplot as plt
+import scipy.stats as stat
 
 
 parser = argparse.ArgumentParser()
@@ -41,6 +42,25 @@ def Logistic_Regression(X_train, y_train):
     """
     model = LogisticRegression(random_state = 0, fit_intercept=True).fit(X_train, y_train)
 
+    # denom = (2.0*(1.0+np.cosh(model.decision_function(X_train))))
+
+    # if model.get_params()['fit_intercept']:
+    #         X_train = np.hstack([np.ones((X_train.shape[0], 1)), X_train])
+
+    # denom = np.tile(denom,(X_train.shape[1],1)).T
+    # F_ij = np.dot((X_train/denom).T,X_train) ## Fisher Information Matrix
+    # Cramer_Rao = np.linalg.inv(F_ij) ## Inverse Information Matrix
+
+    # if model.get_params()['fit_intercept']:
+    #     model.coef = np.column_stack((model.intercept_, model.coef_))
+    # else:
+    #     model.coef = model.coef_
+
+    # sigma_estimates = np.sqrt(np.diagonal(Cramer_Rao))
+    # z_scores = model.coef_[0]/sigma_estimates # z-score for eaach model coefficient
+    # p_values = [stat.norm.sf(abs(x))*2 for x in z_scores]
+    # print(p_values)
+    
     return model
 
 def DecisionTree(X_train, y_train):
@@ -155,7 +175,6 @@ def LOGIT(df):
     Réunion des fonctions nécessaires au fonctionnement du modèle LOGIT
     """
     X_train, X_test, y_train, y_test = Create_Train_Test(df)
-    print(X_train.columns)
     vars = ['native-country_United-States', 'workclass_Private', 'occupation_Occupation:Mid-income', 
             'gender_Male', 'education_HS-grad', 'relationship_Husband', 'marital-status_Married-civ-spouse',
             'race_White', 'age_opti_(28.0, 35.0]', 'hours-per-week_opti_(39.0, 43.0]']
@@ -174,8 +193,6 @@ def TREE(df):
     df_metrics_tree = Evaluation(model_decision_tree, X_test, y_test, False)
     df_metrics_tree, score = Scoring(df_metrics_tree, False)
     df_tracking = Tracking_Dataframe(model_decision_tree.get_params(), df_metrics_tree, score, False)
-
-    
 
 def main():
 
