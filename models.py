@@ -59,7 +59,7 @@ def Logistic_Regression(X_train, y_train):
     # sigma_estimates = np.sqrt(np.diagonal(Cramer_Rao))
     # z_scores = model.coef_[0]/sigma_estimates # z-score for eaach model coefficient
     # p_values = [stat.norm.sf(abs(x))*2 for x in z_scores]
-    # print(p_values)
+    print("p_values")
     
     return model
 
