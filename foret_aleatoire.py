@@ -73,7 +73,7 @@ def ROC(model, X_test, y_test):
     plt.title('Courbe ROC et AUC')
     plt.grid()
     #plt.savefig(f'images/ROC/ROC_{file}.png')
-    # plt.show()
+    plt.show()
 
     return AUC
 
