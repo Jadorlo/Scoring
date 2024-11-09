@@ -76,17 +76,32 @@ def GrilleRecherche(X_train, X_test, y_train, y_test):
     model = tree.DecisionTreeClassifier(random_state=42)
     parameters = {'ccp_alpha':np.linspace(0,0.01, 10),
                   'criterion': ['gini', 'entropy'],
-                  'max_depth': list(range(5, 14)),
-                  'max_leaf_nodes':np.linspace(10, 60, 10),
-                  'min_impurity_decrease': np.linspace(0,0.5,10),
-                  'min_samples_split':np.linspace(20,92,10)
+                  'max_depth': list(range(7, 14)),
+                  'max_leaf_nodes':np.linspace(40, 60, 5, dtype = int),
+                  'min_impurity_decrease': np.linspace(0,0.5,5),
+                  'min_samples_split':np.linspace(20,60,5, dtype = int)
                   }
     
-    clf = GridSearchCV(model, parameters)
+    clf = GridSearchCV(model, parameters, scoring='accuracy', n_jobs=5)
     clf.fit(X_train, y_train)
+
     print(clf.best_params_)
-    print(X_train, y_train)
-    print(X_test, y_test)
+
+    results = clf.cv_results_
+
+    # Tri des résultats par la performance (score moyen dans les cross-validations)
+    sorted_results = sorted(
+    zip(results['mean_test_score'], results['params']),
+    key=lambda x: x[0],
+    reverse=True)
+
+    # Sélection des 10 meilleures combinaisons
+    top_10_combinations = sorted_results[:10]
+
+    # Affichage des 10 meilleures combinaisons
+    for rank, (score, params) in enumerate(top_10_combinations, start=1):
+        print(f"Rank {rank}: Score = {score:.4f}, Parameters = {params} \n")
+    
 
 def Evaluation(model, X_test, y_test, isLogit):
     """
