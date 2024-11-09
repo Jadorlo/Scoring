@@ -10,6 +10,12 @@ def delete_na(df):
 
     return df
 
+def delete_neverworked(df):
+    """
+    """
+    df_nw =df.drop(df.loc[df['workclass']=='Never-worked'].index, axis=0)
+    return df_nw
+
 def drop_columns(df):
     """
     Drop les colonnes fnlwgt, educational-nul car inutiles
@@ -115,4 +121,17 @@ def main_clean_classes_V2():
     df = regroupement(df)
     df.to_csv('files/clean_classes_V2.csv', index=False)
 
-main_clean_classes_V1()
+def main_nouvelle_data():
+    """
+    Charge le fichier de nouvelle données et applique la fonction delete_na 
+    afin de connaitre le nombre d'individus supprimés en appliquant cette fonction
+    """
+    df = pd.read_csv('files/nouvelle_data.csv')
+    n_all = len(df)
+
+    df_del_na = delete_na(df)
+    n_restant = len(df_del_na)
+    print(n_restant/n_all)
+    print(1 - n_restant/n_all)
+
+main_nouvelle_data()

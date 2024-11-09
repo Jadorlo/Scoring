@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import argparse
 import seaborn as sns
 import numpy as np
-from scipy.stats import norm
+from scipy.stats import norm, chi2_contingency, pointbiserialr,f_oneway
 
 
 parser = argparse.ArgumentParser()
@@ -84,10 +84,44 @@ def zscore(serie, delete):
     plt.savefig(f'images/Z-Score/zscore_density_{serie.name}.pdf')
     plt.show()
 
-def V_Cramer_matrix(df):
+def liaison_correlation(df):
     """
     """
-    pass
+
+    # Calcul de Chi-deux pour chaque variable qualitative par rapport à la variable dichotomique
+    chi2_results = {}
+    Cramer_results = {}
+    for col in df.select_dtypes(include='object').columns:
+        contingency_table = pd.crosstab(df[col], df['income'])
+        chi2, p, dof, expected = chi2_contingency(contingency_table)
+        chi2_results[col] = {'Chi2': chi2, 'p-value': p}
+
+        # Calcul du V de Cramer
+        n = contingency_table.values.sum()  # Nombre total d'observations
+        k = min(contingency_table.shape) - 1  # Taille du tableau moins 1
+        cramer_v = np.sqrt(chi2 / (n * k))
+        Cramer_results[col] = cramer_v
+
+    # Affichage des résultats
+    print("Résultats du Chi-deux pour les variables qualitatives :")
+    for var in chi2_results.keys():
+        print(f"{var}: Chi2 = {chi2_results[var]['Chi2']:.4f}, p-value = {chi2_results[var]['p-value']:.4f}")
+        print(f"{var}: V =  {Cramer_results[var]:.4f}")
+
+    # Fonction pour calculer le score d'ANOVA
+    def anova_score(df, qualitative_col, quantitative_col):
+        # Séparer les données en groupes selon la variable qualitative
+        groups = [df[quantitative_col][df[qualitative_col] == category].values for category in df[qualitative_col].unique()]
+
+        # Calcul de l'ANOVA
+        f_stat, p_value = f_oneway(*groups)
+        return {'F-statistic': f_stat, 'p-value': p_value}
+
+    for col in df.select_dtypes(include='int64').columns:
+        anova_results = anova_score(df, 'income', col)
+        print(f"ANOVA {col}: F-statistic = {anova_results['F-statistic']:.4f}, p-value = {anova_results['p-value']:.4f}")
+
+
 
 def capital_without_0(df):
     """
@@ -114,12 +148,14 @@ def capital_without_0(df):
 
 def main():
     df = pd.read_csv(args.filename)
+    print(df.dtypes)
     # boxplot(df)
-    pieplot(df)
+    # pieplot(df)
     # histogram(df)
     # for col in ['age', 'hours-per-week', 'capital-gain', 'capital-loss']:
     #   zscore(df[col], False)
     #capital_without_0(df)
+    liaison_correlation(df)
 
 
 if __name__ == "__main__":
