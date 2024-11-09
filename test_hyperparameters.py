@@ -33,8 +33,29 @@ plt.plot(min_splits, train_scores, c='green', label='Train Score')
 plt.plot(min_splits, test_scores, c='red', label='Test Score')
 plt.legend()
 plt.grid()
-plt.title('Train Test Scores en fonction du nombre mimimum de split')
+plt.title('Train Test Scores en fonction du nombre mimimum de samples split')
 plt.savefig(f'images/hyperparameters/Train_Test_min_splits_{file}.pdf')
+plt.show()
+
+
+#### MIN_SAMPLES_LEAF #####
+
+train_scores = []
+test_scores = []
+min_leaf = np.arange(1, 90)
+
+for leaf in min_leaf:
+    model = tree.DecisionTreeClassifier(min_samples_leaf=leaf).fit(X_train, y_train)
+    train_scores.append(model.score(X_train, y_train))
+    test_scores.append(model.score(X_test, y_test))
+
+plt.figure()
+plt.plot(min_leaf, train_scores, c='green', label='Train Score')
+plt.plot(min_leaf, test_scores, c='red', label='Test Score')
+plt.legend()
+plt.grid()
+plt.title('Train Test Scores en fonction du nombre mimimum de samples leaf')
+plt.savefig(f'images/hyperparameters/Train_Test_min_leaf_{file}.pdf')
 plt.show()
 
 #### MAX_DEPTHS #####

@@ -67,19 +67,28 @@ def DecisionTree(X_train, y_train):
     """
     Créer l'arbre de décision grâce aux datasets d'entraînement
     """
-    model = tree.DecisionTreeClassifier(ccp_alpha=0.0001 ,criterion='gini', max_leaf_nodes=30).fit(X_train, y_train)
+    model = tree.DecisionTreeClassifier(max_depth=13,
+                                        max_leaf_nodes = 70,
+                                        min_samples_leaf=20, 
+                                        min_samples_split=30).fit(X_train, y_train)
     return model
 
 def GrilleRecherche(X_train, X_test, y_train, y_test):
     """
     """
     model = tree.DecisionTreeClassifier(random_state=42)
-    parameters = {'ccp_alpha':np.linspace(0,0.01, 10),
-                  'criterion': ['gini', 'entropy'],
-                  'max_depth': list(range(7, 14)),
-                  'max_leaf_nodes':np.linspace(40, 60, 5, dtype = int),
-                  'min_impurity_decrease': np.linspace(0,0.5,5),
-                  'min_samples_split':np.linspace(20,60,5, dtype = int)
+    # parameters = {'ccp_alpha':np.linspace(0,0.01, 10),
+    #               'criterion': ['gini', 'entropy'],
+    #               'max_depth': list(range(7, 14)),
+    #               'max_leaf_nodes':np.linspace(40, 60, 5, dtype = int),
+    #               'min_impurity_decrease': np.linspace(0,0.5,5),
+    #               'min_samples_split':np.linspace(20,60,5, dtype = int)
+    #               }
+
+    parameters = {'max_depth': list(range(7, 14)),
+                  'max_leaf_nodes':np.linspace(40, 70, 10, dtype = int),
+                  'min_samples_split':np.linspace(30, 60, 10, dtype = int),
+                  'min_samples_leaf' : np.linspace(20, 40, 10, dtype= int)
                   }
     
     clf = GridSearchCV(model, parameters, scoring='accuracy', n_jobs=5)
@@ -202,9 +211,6 @@ def Tracking_Dataframe(params, df_metrics, score, isLogit):
         pass
     return df_tracking
 
-
-
-
 def LOGIT(df):
     """
     Réunion des fonctions nécessaires au fonctionnement du modèle LOGIT
@@ -239,7 +245,7 @@ def TestGridSearch(df):
 def main():
 
     df = pd.read_csv(args.filename)
-    TestGridSearch(df)
+    TREE(df)
 
 if __name__ == "__main__":
     main()
