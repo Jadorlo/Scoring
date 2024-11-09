@@ -18,7 +18,7 @@ def Create_Train_Test(df):
     y = df.pop('income')
     y = pd.get_dummies(y)['>50K']
     X = pd.get_dummies(df)
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state=0)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state=0, stratify=y)
 
     return X_train, X_test, y_train, y_test
 

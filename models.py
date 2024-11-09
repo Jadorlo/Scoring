@@ -1,6 +1,6 @@
 import pandas as pd
 from sklearn.linear_model import LogisticRegression
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn import tree
 from sklearn.metrics import confusion_matrix, classification_report, auc, roc_curve, matthews_corrcoef
 import argparse
@@ -22,7 +22,7 @@ def Create_Train_Test(df):
     y = df.pop('income')
     y = pd.get_dummies(y)['>50K']
     X = pd.get_dummies(df)
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state=0)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state=0, stratify=y)
 
     return X_train, X_test, y_train, y_test
 
@@ -69,6 +69,24 @@ def DecisionTree(X_train, y_train):
     """
     model = tree.DecisionTreeClassifier(ccp_alpha=0.0001 ,criterion='gini', max_leaf_nodes=30).fit(X_train, y_train)
     return model
+
+def GrilleRecherche(X_train, X_test, y_train, y_test):
+    """
+    """
+    model = tree.DecisionTreeClassifier(random_state=42)
+    parameters = {'ccp_alpha':np.linspace(0,0.01, 10),
+                  'criterion': ['gini', 'entropy'],
+                  'max_depth': list(range(5, 14)),
+                  'max_leaf_nodes':np.linspace(10, 60, 10),
+                  'min_impurity_decrease': np.linspace(0,0.5,10),
+                  'min_samples_split':np.linspace(2,92,10)
+                  }
+    
+    clf = GridSearchCV(model, parameters)
+    clf.fit(X_train, y_train)
+    print(clf.best_params_)
+    print(X_train, y_train)
+    print(X_test, y_test)
 
 def Evaluation(model, X_test, y_test, isLogit):
     """
@@ -170,6 +188,8 @@ def Tracking_Dataframe(params, df_metrics, score, isLogit):
     return df_tracking
 
 
+
+
 def LOGIT(df):
     """
     Réunion des fonctions nécessaires au fonctionnement du modèle LOGIT
@@ -194,10 +214,17 @@ def TREE(df):
     df_metrics_tree, score = Scoring(df_metrics_tree, False)
     df_tracking = Tracking_Dataframe(model_decision_tree.get_params(), df_metrics_tree, score, False)
 
+def TestGridSearch(df):
+    """
+    """
+    X_train, X_test, y_train, y_test = Create_Train_Test(df)
+    GrilleRecherche(X_train, X_test, y_train, y_test)
+
+
 def main():
 
     df = pd.read_csv(args.filename)
-    LOGIT(df)
+    TestGridSearch(df)
 
 if __name__ == "__main__":
     main()
