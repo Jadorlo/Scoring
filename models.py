@@ -48,12 +48,12 @@ def DecisionTree(X_train, y_train):
     """
     Créer l'arbre de décision grâce aux datasets d'entraînement
     """
-    # model = tree.DecisionTreeClassifier(max_depth=13,
-    #                                     max_leaf_nodes=63,
-    #                                     min_samples_leaf=20, 
-    #                                     min_samples_split=60).fit(X_train, y_train)
+    model = tree.DecisionTreeClassifier(max_depth=13,
+                                        max_leaf_nodes=63,
+                                        min_samples_leaf=20, 
+                                        min_samples_split=60).fit(X_train, y_train)
 
-    model = tree.DecisionTreeClassifier().fit(X_train, y_train)
+    # model = tree.DecisionTreeClassifier(max_depth=7).fit(X_train, y_train)
     return model
 
 def GrilleRecherche(X_train, X_test, y_train, y_test):
@@ -178,12 +178,15 @@ def gAUC(model, X_test, y_test, var):
         print(col)
         X_auc = X_test.loc[df_var[col]==True]
         y_auc = y_test.iloc[X_auc.index]
-        y_prob = model.predict_proba(X_auc)[:,1]
+        if len(y_auc.unique())!=2:
+            continue
+        else :
+            y_prob = model.predict_proba(X_auc)[:,1]
 
-        col_FER, col_TER, threshold = roc_curve(y_auc, y_prob)
-        AUC = auc(col_FER,col_TER)
-        print(AUC)
-        auc_liste.append(AUC)
+            col_FER, col_TER, threshold = roc_curve(y_auc, y_prob)
+            AUC = auc(col_FER,col_TER)
+            print(AUC)
+            auc_liste.append(AUC)
     gAUC = np.mean(auc_liste)
     return gAUC
     
@@ -258,7 +261,7 @@ def TestGridSearch(df):
 def main():
     global df
     df = pd.read_csv(args.filename)
-    LOGIT(df)
+    TREE(df)
 
 if __name__ == "__main__":
     main()
