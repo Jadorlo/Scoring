@@ -35,39 +35,26 @@ def apply_opti_classes(df):
     df = pd.concat([df, df_classes_opti], axis=1)
     return df
 
-def regroupement_V2(df):
+def regroupement_V1(df):
     """
     """
-    # Regroupement des personnes d'ethnies autre que blanc et noir en "Other_race"
-    df['race'] = df['race'].replace(
-        {'Asian-Pac-Islander|Amer-Indian-Eskimo|Other': 'Other_race'}, regex=True)
-
-    # Regroupement des personnes d'origines différentes en une cartégorie "Other"
+    # Regroupement des individus Never-Worked (10/48843), Without-pay(21/48843) et ? dans No_income_or_unknown
+    df['workclass'] = df['workclass'].replace(
+        {'Never-worked|Without-pay|\?' : 'No_income_or_unknown'}, regex=True)
+    
+    # Regroupement des autres nationalités et ? dans Other_country
     df['native-country'] = df['native-country'].replace(
         {'^(?!United-States$).+': 'Other_country'}, regex=True)
-
-    # Regroupement des personnes mariés mais avec un conjoint dans l'armé avec les personnes mariés mais avec un conjoint absent pour diverse raisons
-    df['marital-status'] = df['marital-status'].replace(
-        {'Married-AF-spouse|Divorced|Widowed|Separated|Married-spouse-absent': 'Alone'}, regex = True)
-
-    df['education'] = df['education'].replace(
-        {'Preschool|1st-4th|5th-6th|7th-8th|9th|10th|11th|12th': 'Low-education',
-        'Doctorate|Prof-school': "Graduation",
-        "Assoc-acdm|Assoc-voc" : 'Assoc'}, regex=True)
-
-    df['workclass'] = df['workclass'].replace(
-        {'Local-gov|State-gov': 'State-Local-gov'}, regex=True)
-
+    
+    # Remplacement des ? dans Other-service 
     df['occupation'] = df['occupation'].replace(
-        {'Priv-house-serv|Other-service|Handlers-cleaners': 'Occupation:Very-Low-income',
-        'Farming-fishing|Machine-op-inspct|Adm-clerical': "Occupation:Low-income",
-        'Transport-moving|Craft-repair' : 'Occupation:Mid-income',
-        'Sales|Armed-Forces|Tech-support|Protective-serv|Protective-serv' :'Occupation:High-income',
-        'Prof-specialty|Exec-managerial' : 'Occupation:VeryHigh-income'}, regex=True)
+        {'\?' : 'Other-service'}, regex=True)
     
     return df
+    
 
-def regroupement_V3(df):
+
+def regroupement_V2(df):
     """
     """
     # Regroupement des personnes d'ethnies autre que blanc et noir en "Other_race"
@@ -119,49 +106,27 @@ def classes_manuelles(df):
     df.drop(['capital-gain', 'capital-loss'], inplace=True, axis=1)
     return df
 
-def main_clean():
+
+def main_data_V1():
     """
-    Renvoie un dataframe sans valeurs manquantes ni colonnes inutiles
-    les outliers sont tjs présents
+    Crée le fichier de données V2 avec le regroupement des ?, et des modalités aberrantes (trop peu représentées)
+    soit Never-worked, Without-pay et les nationalités différentes de United-States.
     """
     df = pd.read_csv('files/revenus.csv')
     df = drop_columns(df)
-    df = delete_na(df)
-    df.reset_index(inplace=True, drop=True)
-    df.to_csv('files/clean.csv', index=False)
+    df = regroupement_V1(df)
+    df.to_csv('files/data/data_V1.csv', index=False)
 
-def main_clean_classes_V0():
+def main_data_V2():
     """
-    Renvoie le dataframe clean avec l'application des classes optimisées sur age et sur hours-per-week,
-    ainsi que les classes manuelles pour capital-gain et capital-loss
+    Crée le fichier de données V2 avec le regroupement des ?, le regroupement des modalités 
+    et l'application des classes optimisées pour les variables age et hours-per-week
     """
-    df = pd.read_csv('files/clean.csv')
-    df = apply_opti_classes(df)
-    df = classes_manuelles(df)
-    df.to_csv('files/clean_classes_V0.csv', index=False)
-
-def main_clean_classes_V1():
-    """
-    """
-    df = pd.read_csv('files/clean.csv')
-    df = apply_opti_classes(df)
-    df.to_csv('files/clean_classes_V1.csv', index=False)
-
-def main_clean_classes_V2():
-    """
-    """
-    df = pd.read_csv('files/clean.csv')
+    df = pd.read_csv('files/revenus.csv')
+    df = drop_columns(df)
     df = apply_opti_classes(df)
     df = regroupement_V2(df)
-    df.to_csv('files/clean_classes_V2.csv', index=False)
+    df.to_csv('files/data/data_V2.csv', index=False)
 
-def main_clean_classes_V3():
-    """
-    """
-    df = pd.read_csv('files/revenus.csv')
-    df = drop_columns(df)
-    df = apply_opti_classes(df)
-    df = regroupement_V3(df)
-    df.to_csv('files/clean_classes_V3.csv', index=False)
-
-main_clean_classes_V3()
+main_data_V1()
+main_data_V2()

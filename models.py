@@ -68,9 +68,9 @@ def DecisionTree(X_train, y_train):
     Créer l'arbre de décision grâce aux datasets d'entraînement
     """
     model = tree.DecisionTreeClassifier(max_depth=13,
-                                        max_leaf_nodes = 70,
+                                        max_leaf_nodes = 63,
                                         min_samples_leaf=20, 
-                                        min_samples_split=30).fit(X_train, y_train)
+                                        min_samples_split=60).fit(X_train, y_train)
     return model
 
 def GrilleRecherche(X_train, X_test, y_train, y_test):
@@ -139,7 +139,8 @@ def Evaluation(model, X_test, y_test, isLogit):
     Accuracy = model.score(X_test,y_test)
     class_report = classification_report(y_test, predict_Y, output_dict=True)
     class_report = pd.DataFrame(class_report)
-    f1_score = class_report.loc['f1-score']['True']
+    print(class_report)
+    f1_score = class_report.loc['f1-score']['accuracy']
     MCC = matthews_corrcoef(y_test, predict_Y)
     AUC = ROC(model, X_test, y_test, isLogit)
 
