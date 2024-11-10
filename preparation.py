@@ -30,9 +30,9 @@ def apply_opti_classes(df):
     serie_age = pd.read_csv('files/files_classes_opti/classes_opti_alexander_age.csv')
     serie_hpw = pd.read_csv('files/files_classes_opti/classes_opti_alexander_hours-per-week.csv') 
     df_classes_opti = pd.concat([serie_age, serie_hpw], axis=1)
-    df_classes_opti.columns = ['age_opti', 'hours-per-week_opti']
-    df = pd.concat([df, df_classes_opti], axis=1)
     df.drop(['age', 'hours-per-week'], inplace=True, axis=1)
+    df_classes_opti.columns = ['age', 'hours-per-week']
+    df = pd.concat([df, df_classes_opti], axis=1)
     return df
 
 def regroupement_V2(df):

@@ -88,7 +88,7 @@ def GrilleRecherche(X_train, X_test, y_train, y_test):
     parameters = {'max_depth': list(range(7, 14)),
                   'max_leaf_nodes':np.linspace(40, 70, 10, dtype = int),
                   'min_samples_split':np.linspace(30, 60, 10, dtype = int),
-                  'min_samples_leaf' : np.linspace(20, 40, 10, dtype= int)
+                  'min_samples_leaf':np.linspace(20, 40, 10, dtype = int)
                   }
     
     clf = GridSearchCV(model, parameters, scoring='accuracy', n_jobs=5)

@@ -68,7 +68,7 @@ def optimize_classes(serie, df_income, bins):
     return df_classes_min, khisq_min, pval_min, ddl_min, conv
 
 def test(df_classes, khisq, pval, df_income, col):
-    df1 = pd.read_csv('files/files_classes_opti/classes_opti_alexander_age.csv')
+    df1 = pd.read_csv(f'files/files_classes_opti/classes_opti_alexander_{col}.csv')
     serie_classe_actuelle = df1['classes_opti']
     table_actuelle = pd.crosstab(serie_classe_actuelle, df_income)
     khi_act, pval_act, ddl, contigent_theo = chi2_contingency(table_actuelle)
@@ -81,12 +81,13 @@ def test(df_classes, khisq, pval, df_income, col):
 
         
 def main():
-    df = pd.read_csv('files/clean.csv')
+    df = pd.read_csv('files/revenus.csv')
     df_income = df['income']
-    col = 'age'
-    df_classes, khisq, pval, ddl, conv = optimize_classes(df[col], df_income, 5)
+    col = 'hours-per-week'
+    df_classes, khisq, pval, ddl, conv = optimize_classes(df[col], df_income, 4)
     print(df_classes, khisq, pval, ddl, conv)
-    print(test(df_classes, khisq, pval, df_income, col))
+    df_classes.to_csv(f'files/files_classes_opti/classes_opti_alexander_{col}.csv', index=False)
+    # print(test(df_classes, khisq, pval, df_income, col))
 
 
 if __name__ == "__main__":
