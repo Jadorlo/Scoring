@@ -35,7 +35,7 @@ def apply_opti_classes(df):
     df.drop(['age', 'hours-per-week'], inplace=True, axis=1)
     return df
 
-def regroupement(df):
+def regroupement_V2(df):
     """
     """
     # Regroupement des personnes d'ethnies autre que blanc et noir en "Other_race"
@@ -66,6 +66,40 @@ def regroupement(df):
         'Prof-specialty|Exec-managerial' : 'Occupation:VeryHigh-income'}, regex=True)
     
     return df
+
+def regroupement_V3(df):
+    """
+    """
+    # Regroupement des personnes d'ethnies autre que blanc et noir en "Other_race"
+    df['race'] = df['race'].replace(
+        {'Asian-Pac-Islander|Amer-Indian-Eskimo|Other': 'Other_race'}, regex=True)
+
+    # Regroupement des personnes d'origines différentes en une cartégorie "Other"
+    df['native-country'] = df['native-country'].replace(
+        {'^(?!United-States$).+': 'Other_country'}, regex=True)
+
+    # Regroupement des personnes mariés mais avec un conjoint dans l'armé avec les personnes mariés mais avec un conjoint absent pour diverse raisons
+    df['marital-status'] = df['marital-status'].replace(
+        {'Married-AF-spouse|Divorced|Widowed|Separated|Married-spouse-absent': 'Alone'}, regex = True)
+
+    df['education'] = df['education'].replace(
+        {'Preschool|1st-4th|5th-6th|7th-8th|9th|10th|11th|12th': 'Low-education',
+        'Doctorate|Prof-school': "Graduation",
+        "Assoc-acdm|Assoc-voc" : 'Assoc'}, regex=True)
+
+    df['workclass'] = df['workclass'].replace(
+        {'Local-gov|State-gov': 'State-Local-gov',
+         'Never-worked|Without-pay|\?' : 'No_income_or_unknown'}, regex=True)
+
+    df['occupation'] = df['occupation'].replace(
+        {'\?|Priv-house-serv|Other-service|Handlers-cleaners': 'Occupation:Very-Low-income',
+        'Farming-fishing|Machine-op-inspct|Adm-clerical': "Occupation:Low-income",
+        'Transport-moving|Craft-repair' : 'Occupation:Mid-income',
+        'Sales|Armed-Forces|Tech-support|Protective-serv|Protective-serv' :'Occupation:High-income',
+        'Prof-specialty|Exec-managerial' : 'Occupation:VeryHigh-income'}, regex=True)
+    
+    return df
+
 
 def classes_manuelles(df):
     """
@@ -118,20 +152,16 @@ def main_clean_classes_V2():
     """
     df = pd.read_csv('files/clean.csv')
     df = apply_opti_classes(df)
-    df = regroupement(df)
+    df = regroupement_V2(df)
     df.to_csv('files/clean_classes_V2.csv', index=False)
 
-def main_nouvelle_data():
+def main_clean_classes_V3():
     """
-    Charge le fichier de nouvelle données et applique la fonction delete_na 
-    afin de connaitre le nombre d'individus supprimés en appliquant cette fonction
     """
-    df = pd.read_csv('files/nouvelle_data.csv')
-    n_all = len(df)
+    df = pd.read_csv('files/revenus.csv')
+    df = drop_columns(df)
+    df = apply_opti_classes(df)
+    df = regroupement_V3(df)
+    df.to_csv('files/clean_classes_V3.csv', index=False)
 
-    df_del_na = delete_na(df)
-    n_restant = len(df_del_na)
-    print(n_restant/n_all)
-    print(1 - n_restant/n_all)
-
-main_nouvelle_data()
+main_clean_classes_V3()
