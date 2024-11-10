@@ -42,35 +42,18 @@ def Logistic_Regression(X_train, y_train):
     """
     model = LogisticRegression(random_state = 0, fit_intercept=True).fit(X_train, y_train)
 
-    # denom = (2.0*(1.0+np.cosh(model.decision_function(X_train))))
-
-    # if model.get_params()['fit_intercept']:
-    #         X_train = np.hstack([np.ones((X_train.shape[0], 1)), X_train])
-
-    # denom = np.tile(denom,(X_train.shape[1],1)).T
-    # F_ij = np.dot((X_train/denom).T,X_train) ## Fisher Information Matrix
-    # Cramer_Rao = np.linalg.inv(F_ij) ## Inverse Information Matrix
-
-    # if model.get_params()['fit_intercept']:
-    #     model.coef = np.column_stack((model.intercept_, model.coef_))
-    # else:
-    #     model.coef = model.coef_
-
-    # sigma_estimates = np.sqrt(np.diagonal(Cramer_Rao))
-    # z_scores = model.coef_[0]/sigma_estimates # z-score for eaach model coefficient
-    # p_values = [stat.norm.sf(abs(x))*2 for x in z_scores]
-    print("p_values")
-    
     return model
 
 def DecisionTree(X_train, y_train):
     """
     Créer l'arbre de décision grâce aux datasets d'entraînement
     """
-    model = tree.DecisionTreeClassifier(max_depth=13,
-                                        max_leaf_nodes = 63,
-                                        min_samples_leaf=20, 
-                                        min_samples_split=60).fit(X_train, y_train)
+    # model = tree.DecisionTreeClassifier(max_depth=13,
+    #                                     max_leaf_nodes=63,
+    #                                     min_samples_leaf=20, 
+    #                                     min_samples_split=60).fit(X_train, y_train)
+
+    model = tree.DecisionTreeClassifier().fit(X_train, y_train)
     return model
 
 def GrilleRecherche(X_train, X_test, y_train, y_test):
@@ -144,8 +127,16 @@ def Evaluation(model, X_test, y_test, isLogit):
     MCC = matthews_corrcoef(y_test, predict_Y)
     AUC = ROC(model, X_test, y_test, isLogit)
 
-    df_metrics = pd.DataFrame({'Valeur':[AUC, f1_score, Accuracy, MCC, None],
-                               'Cible':[0.8, 0.75, 0.85, 0.75, None]},
+    #Calcul du gAUC moyen
+    gAUC_liste = []
+    for var in df.select_dtypes(include='object').columns:
+        print(var)
+        gauc = gAUC(model, X_test, y_test, var)
+        gAUC_liste.append(gauc)
+    gauc = np.mean(gAUC_liste)
+
+    df_metrics = pd.DataFrame({'Valeur':[AUC, f1_score, Accuracy, MCC, gauc],
+                               'Cible':[0.8, 0.75, 0.85, 0.75, 0.8]},
                                index = ['AUC', 'F1-Score', 'Accuracy', 'MCC', 'gAUC'])
     return df_metrics
 
@@ -173,6 +164,30 @@ def ROC(model, X_test, y_test, isLogit):
 
     return AUC
 
+def gAUC(model, X_test, y_test, var):
+    """
+    Calcule le gAUC pour une variable qualitative arbitraire
+    """
+    X_test.reset_index(inplace=True, drop=True)
+    y_test.reset_index(inplace=True, drop=True)
+    df_var = X_test.filter(regex=f"^{var}")
+    
+    auc_liste = []
+
+    for col in df_var:
+        print(col)
+        X_auc = X_test.loc[df_var[col]==True]
+        y_auc = y_test.iloc[X_auc.index]
+        y_prob = model.predict_proba(X_auc)[:,1]
+
+        col_FER, col_TER, threshold = roc_curve(y_auc, y_prob)
+        AUC = auc(col_FER,col_TER)
+        print(AUC)
+        auc_liste.append(AUC)
+    gAUC = np.mean(auc_liste)
+    return gAUC
+    
+
 def Scoring(df_metrics, isLogit):
     """
     Calcul le score du modèle en fonction des métriques de df_metrics
@@ -194,7 +209,6 @@ def Tracking_Dataframe(params, df_metrics, score, isLogit):
     now = datetime.now()
     
     df_tracking = pd.DataFrame([{'Date':now.strftime("%d/%m/%Y %H:%M:%S"), 'Score':score, 'File':args.filename.split('/')[-1].split('.')[0]}])
-    #print([f'{i}_cible' for i in df_metrics.index.tolist()])
     df_tracking[df_metrics.index] = df_metrics['Valeur'].T
     df_cible = df_metrics['Cible'].T
     df_tracking[[f'{i}_cible' for i in df_metrics.index.tolist()]] = df_cible
@@ -205,11 +219,9 @@ def Tracking_Dataframe(params, df_metrics, score, isLogit):
     df_tracking = df_tracking.reindex(columns=new_index)
     df_tracking.index.name = "index"
     if not isLogit:
-        pass
         df_tracking.to_csv('files/tracking_models_files/tracking_decision_tree.csv', mode='a', header=False)
     else:
         df_tracking.to_csv('files/tracking_models_files/tracking_logit.csv', mode='a', header=False)
-        pass
     return df_tracking
 
 def LOGIT(df):
@@ -217,10 +229,11 @@ def LOGIT(df):
     Réunion des fonctions nécessaires au fonctionnement du modèle LOGIT
     """
     X_train, X_test, y_train, y_test = Create_Train_Test(df)
-    vars = ['native-country_United-States', 'workclass_Private', 'occupation_Occupation:Mid-income', 
-            'gender_Male', 'education_HS-grad', 'relationship_Husband', 'marital-status_Married-civ-spouse',
-            'race_White', 'age_opti_(28.0, 35.0]', 'hours-per-week_opti_(39.0, 43.0]']
-    refs_vars, X_train, X_test = Drop_References_Variables(X_train, X_test, vars)
+    print(X_train.dtypes)
+    #vars = ['native-country_United-States', 'workclass_Private', 'occupation_Occupation:Mid-income', 
+    #        'gender_Male', 'education_HS-grad', 'relationship_Husband', 'marital-status_Married-civ-spouse',
+    #        'race_White', 'age_(28.0, 33.0]', 'hours-per-week_(37.0, 43.0]']
+    #refs_vars, X_train, X_test = Drop_References_Variables(X_train, X_test, vars)
     model_logit = Logistic_Regression(X_train, y_train)
     df_metrics_logit = Evaluation(model_logit, X_test, y_test, True)
     df_metrics_logit, score = Scoring(df_metrics_logit, True)
@@ -242,11 +255,10 @@ def TestGridSearch(df):
     X_train, X_test, y_train, y_test = Create_Train_Test(df)
     GrilleRecherche(X_train, X_test, y_train, y_test)
 
-
 def main():
-
+    global df
     df = pd.read_csv(args.filename)
-    TREE(df)
+    LOGIT(df)
 
 if __name__ == "__main__":
     main()
