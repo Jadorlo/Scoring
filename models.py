@@ -222,9 +222,9 @@ def Tracking_Dataframe(params, df_metrics, score, isLogit):
     df_tracking = df_tracking.reindex(columns=new_index)
     df_tracking.index.name = "index"
     if not isLogit:
-        df_tracking.to_csv('files/tracking_models_files/tracking_decision_tree.csv', mode='a', header=False)
+        df_tracking.to_csv('files/tracking_models_scores/tracking_decision_tree.csv', mode='a', header=False)
     else:
-        df_tracking.to_csv('files/tracking_models_files/tracking_logit.csv', mode='a', header=False)
+        df_tracking.to_csv('files/tracking_models_scores/tracking_logit.csv', mode='a', header=False)
     return df_tracking
 
 def LOGIT(df):

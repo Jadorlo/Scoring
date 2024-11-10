@@ -27,8 +27,8 @@ def apply_opti_classes(df):
     """
     Applique les classes optimisées générées par le fichier optimisation_classes.py
     """
-    serie_age = pd.read_csv('files/files_classes_opti/classes_opti_alexander_age.csv')
-    serie_hpw = pd.read_csv('files/files_classes_opti/classes_opti_alexander_hours-per-week.csv') 
+    serie_age = pd.read_csv('files/classes_opti/classes_opti_alexander_age.csv')
+    serie_hpw = pd.read_csv('files/classes_opti/classes_opti_alexander_hours-per-week.csv') 
     df_classes_opti = pd.concat([serie_age, serie_hpw], axis=1)
     df.drop(['age', 'hours-per-week'], inplace=True, axis=1)
     df_classes_opti.columns = ['age', 'hours-per-week']
@@ -40,11 +40,11 @@ def regroupement_V1(df):
     """
     # Regroupement des individus Never-Worked (10/48843), Without-pay(21/48843) et ? dans No_income_or_unknown
     df['workclass'] = df['workclass'].replace(
-        {'Never-worked|Without-pay|\?' : 'No_income_or_unknown'}, regex=True)
+        {'\?' : 'No_income_or_unknown'}, regex=True)
     
     # Regroupement des autres nationalités et ? dans Other_country
     df['native-country'] = df['native-country'].replace(
-        {'^(?!United-States$).+': 'Other_country'}, regex=True)
+        {'\?': 'Other_country'}, regex=True)
     
     # Remplacement des ? dans Other-service 
     df['occupation'] = df['occupation'].replace(
@@ -83,29 +83,9 @@ def regroupement_V2(df):
         'Farming-fishing|Machine-op-inspct|Adm-clerical': "Occupation:Low-income",
         'Transport-moving|Craft-repair' : 'Occupation:Mid-income',
         'Sales|Armed-Forces|Tech-support|Protective-serv|Protective-serv' :'Occupation:High-income',
-        'Prof-specialty|Exec-managerial' : 'Occupation:VeryHigh-income'}, regex=True)
+        'Prof-specialty|Exec-managerial' : 'Occupation:Very-High-income'}, regex=True)
     
     return df
-
-
-def classes_manuelles(df):
-    """
-    Génère des classes manuelles
-    Pour les variables capital-gain et capital-loss
-        ->  Devient des variables binaires (pour le moment?): gagne ou ne gagne pas
-                                                              perds ou ne perds pas
-    """
-    serie_gain = df['capital-gain']
-    serie_loss = df['capital-loss']
-
-    serie_classes_gain = serie_gain.apply(lambda x : 1 if x!=0 else 0)
-    serie_classes_loss = serie_loss.apply(lambda x : 1 if x!=0 else 0)
-    df_classes = pd.concat([serie_classes_gain, serie_classes_loss], axis=1)
-    df_classes.columns = ['capital-gain-classes', 'capital-loss-classes']
-    df = pd.concat([df, df_classes], axis=1)
-    df.drop(['capital-gain', 'capital-loss'], inplace=True, axis=1)
-    return df
-
 
 def main_data_V1():
     """
