@@ -232,7 +232,7 @@ def LOGIT(df):
     Réunion des fonctions nécessaires au fonctionnement du modèle LOGIT
     """
     X_train, X_test, y_train, y_test = Create_Train_Test(df)
-    print(X_train.dtypes)
+    print(X_train.shape)
     #vars = ['native-country_United-States', 'workclass_Private', 'occupation_Occupation:Mid-income', 
     #        'gender_Male', 'education_HS-grad', 'relationship_Husband', 'marital-status_Married-civ-spouse',
     #        'race_White', 'age_(28.0, 33.0]', 'hours-per-week_(37.0, 43.0]']
@@ -261,7 +261,7 @@ def TestGridSearch(df):
 def main():
     global df
     df = pd.read_csv(args.filename)
-    TREE(df)
+    LOGIT(df)
 
 if __name__ == "__main__":
     main()
