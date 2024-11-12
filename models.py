@@ -7,7 +7,6 @@ import argparse
 import numpy as np
 from datetime import datetime
 import matplotlib.pyplot as plt
-import scipy.stats as stat
 
 
 parser = argparse.ArgumentParser()
