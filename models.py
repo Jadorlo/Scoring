@@ -257,7 +257,7 @@ def TestGridSearch(df):
 def main():
     global df
     df = pd.read_csv(args.filename)
-    LOGIT(df)
+    TREE(df)
 
 if __name__ == "__main__":
     main()
