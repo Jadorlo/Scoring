@@ -47,10 +47,7 @@ def DecisionTree(X_train, y_train):
     """
     Créer l'arbre de décision grâce aux datasets d'entraînement
     """
-    model = tree.DecisionTreeClassifier(max_depth=13,
-                                        max_leaf_nodes=63,
-                                        min_samples_leaf=20, 
-                                        min_samples_split=60).fit(X_train, y_train)
+    model = tree.DecisionTreeClassifier().fit(X_train, y_train)
 
     # model = tree.DecisionTreeClassifier(max_depth=7).fit(X_train, y_train)
     return model
