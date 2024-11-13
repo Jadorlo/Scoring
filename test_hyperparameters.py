@@ -31,10 +31,12 @@ for split in min_splits:
 plt.figure()
 plt.plot(min_splits, train_scores, c='green', label='Train Score')
 plt.plot(min_splits, test_scores, c='red', label='Test Score')
-plt.legend()
 plt.grid()
-plt.title('Train Test Scores en fonction du nombre mimimum de samples split')
-plt.savefig(f'images/hyperparameters/Train_Test_min_splits_{file}.pdf')
+plt.ylabel('Accuracy')
+plt.xlabel('MIN_SAMPLES_SPLIT')
+plt.legend()
+plt.title('Train Test Scores en fonction de MIN_SAMPLES_SPLIT')
+plt.savefig(f'images/hyperparameters/Train_Test_MIN_SAMPLES_SPLIT_{file}.png')
 plt.show()
 
 
@@ -52,10 +54,12 @@ for leaf in min_leaf:
 plt.figure()
 plt.plot(min_leaf, train_scores, c='green', label='Train Score')
 plt.plot(min_leaf, test_scores, c='red', label='Test Score')
-plt.legend()
 plt.grid()
-plt.title('Train Test Scores en fonction du nombre mimimum de samples leaf')
-plt.savefig(f'images/hyperparameters/Train_Test_min_leaf_{file}.pdf')
+plt.ylabel('Accuracy')
+plt.xlabel('MIN_SAMPLES_LEAF')
+plt.legend()
+plt.title('Train Test Scores en fonction de MIN_SAMPLES_LEAF')
+plt.savefig(f'images/hyperparameters/Train_Test_MIN_SAMPLES_LEAF_{file}.png')
 plt.show()
 
 #### MAX_DEPTHS #####
@@ -72,10 +76,12 @@ for depth in max_depths:
 plt.figure()
 plt.plot(max_depths, train_scores, c='green', label='Train Score')
 plt.plot(max_depths, test_scores, c='red', label='Test Score')
-plt.legend()
 plt.grid()
-plt.title("Train Test Scores en fonction de la profondeur maximum de l'arbre")
-plt.savefig(f'images/hyperparameters/Train_Test_max_depths_{file}.pdf')
+plt.ylabel('Accuracy')
+plt.xlabel('MAX_DEPTH')
+plt.legend()
+plt.title("Train Test Scores en fonction de MAX_DEPTH")
+plt.savefig(f'images/hyperparameters/Train_Test_MAX_DEPTH_{file}.png')
 plt.show()
 
 #### CCP_ALPHA #####
@@ -92,15 +98,17 @@ for ccp in ccp_alphas:
 plt.figure()
 plt.plot(ccp_alphas, train_scores, c='green', label='Train Score')
 plt.plot(ccp_alphas, test_scores, c='red', label='Test Score')
-plt.legend()
 plt.grid()
-plt.title("Train Test Scores en fonction du ccp_alpha")
-plt.savefig(f'images/hyperparameters/Train_Test_ccp_alpha_{file}.pdf')
+plt.ylabel('Accuracy')
+plt.xlabel('CCP_ALPHA')
+plt.legend()
+plt.title("Train Test Scores en fonction de CCP_ALPHA")
+plt.savefig(f'images/hyperparameters/Train_Test_CCP_ALPHA_{file}.png')
 plt.show()
 
 
 
-#### MAX LEAF NODES #####
+#### MAX_LEAF_NODES #####
 
 train_scores = []
 test_scores = []
@@ -114,8 +122,10 @@ for max_leaf in max_leafs:
 plt.figure()
 plt.plot(max_leafs, train_scores, c='green', label='Train Score')
 plt.plot(max_leafs, test_scores, c='red', label='Test Score')
-plt.legend()
 plt.grid()
-plt.title("Train Test Scores en fonction du nombre maximum de feuilles")
-plt.savefig(f'images/hyperparameters/Train_Test_max_leaf_nodes_{file}.pdf')
+plt.ylabel('Accuracy')
+plt.xlabel('MAX_LEAF_NODES')
+plt.legend()
+plt.title("Train Test Scores en fonction de MAX_LEAF_NODES")
+plt.savefig(f'images/hyperparameters/Train_Test_MAX_LEAF_NODES_{file}.png')
 plt.show()
