@@ -47,7 +47,11 @@ def DecisionTree(X_train, y_train):
     """
     Créer l'arbre de décision grâce aux datasets d'entraînement
     """
-    model = tree.DecisionTreeClassifier().fit(X_train, y_train)
+    model = tree.DecisionTreeClassifier(random_state=42,
+                                        max_depth=13,
+                                        max_leaf_nodes=63,
+                                        min_samples_leaf=20, 
+                                        min_samples_split=60).fit(X_train, y_train)
 
     # model = tree.DecisionTreeClassifier(max_depth=7).fit(X_train, y_train)
     return model
@@ -118,8 +122,8 @@ def Evaluation(model, X_test, y_test, isLogit):
     Accuracy = model.score(X_test,y_test)
     class_report = classification_report(y_test, predict_Y, output_dict=True)
     class_report = pd.DataFrame(class_report)
-    print(class_report)
-    f1_score = class_report.loc['f1-score']['accuracy']
+    8
+    f1_score = class_report.loc['f1-score']['macro avg']
     MCC = matthews_corrcoef(y_test, predict_Y)
     AUC = ROC(model, X_test, y_test, isLogit)
 

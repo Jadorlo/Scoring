@@ -52,8 +52,6 @@ def regroupement_V1(df):
     
     return df
     
-
-
 def regroupement_V2(df):
     """
     """
